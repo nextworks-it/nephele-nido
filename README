@@ -1,7 +1,7 @@
-This is NIDO: NEPHELE Inter DC Orchestrator
+# NEPHELE Inter DC Orchestrator (NIDO)
 
-Warnings:
-1. Much in progress
-2. Better name to be found soon
-3. License to be decided asap
-4. To be removed from EMMO repo asap
+NIDO is an orchestrator able to communicate with several domain (i.e. DCN)
+SDN controllers, in order to establish end-to-end data paths.
+
+At the moment, it is compatible with OCEANIA DCN controller and Julius
+inter-DC network controller.
