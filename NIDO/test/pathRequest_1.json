@@ -1,0 +1,23 @@
+{
+	"interDomainPathId":"interDomain_002",
+	"name":"test",
+	"pathType":"INTER_DOMAIN",
+	"sourceEndPoint": {
+		"domainId":"DCN_01",
+		"nodeId":"110001",
+		"portId":"4"
+	},
+	"destinationEndPoint": {
+		"domainId":"DCN_02",
+		"nodeId":"120001",
+		"portId":"4"
+	},
+	"connectionType":"POINT_TO_POINT",
+	"trafficClassifier": {
+		"dstIpAddress":"10.20.1.5"
+	},
+	"trafficProfile": {
+		"bandwidth": 20
+	},
+	"pathStatus": "REQUESTED"
+}
