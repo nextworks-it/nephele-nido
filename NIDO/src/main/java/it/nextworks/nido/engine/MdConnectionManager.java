@@ -148,6 +148,7 @@ public class MdConnectionManager {
 					currentIntraDomainPaths.add(cIdp);
 					pathDbWrapper.createIntraDomainPath(interDomainConnectionId, cIdp);
 				} catch (Exception e) {
+					//TODO: Here it should invoke the tear-down of the created path. Implement rollback mechanisms.
 					log.error("Error while requesting intra-domain path provisioning: " + e.getMessage());
 					notifyPathFailure();
 					return;

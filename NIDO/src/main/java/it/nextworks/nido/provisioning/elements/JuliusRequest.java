@@ -8,6 +8,7 @@
  */
 package it.nextworks.nido.provisioning.elements;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -19,6 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class JuliusRequest {
 
     @JsonProperty("demands")
-    public List<JuliusConnectionRequest> demands;
+    public List<JuliusConnectionRequest> demands = new ArrayList<>();
 
 }
