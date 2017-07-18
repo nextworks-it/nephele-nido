@@ -1,5 +1,5 @@
 
-var nfvoAddr = 'localhost';
+var nfvoAddr = '10.10.1.82';
 var nfvoPort = '8989';
 
 var stopRefreshing = false;
