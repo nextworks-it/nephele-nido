@@ -76,7 +76,21 @@ public class JuliusPlugin extends ProvisioningPlugin {
 			request.demands.add(connection);
 			String localId = postService(request, interDomainPathId);
 			String globalId = globalize(localId);
-			log.info("Sub path of '{}' on domain '{}' requested: id is '{}'.", interDomainPathId, domainId, globalId);
+			if (localId.equals("FAILED")) {
+				log.error("Sub path of '{}' on domain '{}' setup failed: id is '{}'.",
+						interDomainPathId, domainId, globalId);
+
+				throw new GeneralFailureException(
+						String.format("Julius reported failure of instantiation of intra domain path" +
+								"under inter domain path '%s'.", interDomainPathId));
+			}
+			log.info("Sub path of '{}' on domain '{}' established: id is '{}'.", interDomainPathId, domainId, globalId);
+			listener.notifyIntraDomainPathModification(
+					interDomainPathId,
+					globalId,
+					PathLifecycleAction.SETUP,
+					OperationResult.COMPLETED
+			);
 			return globalId;
 		} catch (Exception e) {
 			log.error("Error during intra domain path setup. {}: {}.", e.getClass().getSimpleName(), e.getMessage());
