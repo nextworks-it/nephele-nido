@@ -8,6 +8,8 @@
  */
 package it.nextworks.nido.provisioning.plugin;
 
+import it.nextworks.nido.common.enums.OperationResult;
+import it.nextworks.nido.common.enums.PathLifecycleAction;
 import it.nextworks.nido.common.exceptions.EntityNotFoundException;
 import it.nextworks.nido.common.exceptions.GeneralFailureException;
 import it.nextworks.nido.engine.PathNotificationListenerInterface;
@@ -47,34 +49,40 @@ public class JuliusPlugin extends ProvisioningPlugin {
 	public String setupIntraDomainPath(String interDomainPathId, IntraDomainPath path, PathNotificationListenerInterface listener)
 			throws EntityNotFoundException, GeneralFailureException {
 		log.info("Setting up sub path of '{}' in domain '{}'.", interDomainPathId, domainId);
-		String srcId = path.getSourceEndPoint().getNodeId();
-		String dstId = path.getDestinationEndPoint().getNodeId();
-		if (!isNumeric(srcId)) {
-			throw new GeneralFailureException(
-					String.format("Received non numeric id '%s', in path %s.", srcId, interDomainPathId)
+		try {
+			String srcId = path.getSourceEndPoint().getNodeId();
+			String dstId = path.getDestinationEndPoint().getNodeId();
+			if (!isNumeric(srcId)) {
+				throw new GeneralFailureException(
+						String.format("Received non numeric id '%s', in path %s.", srcId, interDomainPathId)
+				);
+			}
+			if (!isNumeric(dstId)) {
+				throw new GeneralFailureException(
+						String.format("Received non numeric id '%s', in path %s.", dstId, interDomainPathId)
+				);
+			}
+			int srcIntId = Integer.parseInt(srcId);
+			int dstIntId = Integer.parseInt(dstId);
+			JuliusConnectionRequest connection = new JuliusConnectionRequest(
+					getCounter(),
+					srcIntId,
+					dstIntId,
+					0,
+					path.getTrafficProfile().getBandwidth()
 			);
-		}
-		if (!isNumeric(dstId)) {
-			throw new GeneralFailureException(
-					String.format("Received non numeric id '%s', in path %s.", dstId, interDomainPathId)
-			);
-		}
-		int srcIntId = Integer.parseInt(srcId);
-		int dstIntId = Integer.parseInt(dstId);
-		JuliusConnectionRequest connection = new JuliusConnectionRequest(
-				getCounter(),
-				srcIntId,
-				dstIntId,
-				0,
-				path.getTrafficProfile().getBandwidth()
-		);
 
-		JuliusRequest request = new JuliusRequest();
-		request.demands.add(connection);
-		String localId = postService(request, interDomainPathId);
-		String globalId = globalize(localId);
-		log.info("Sub path of '{}' on domain '{}' requested: id is '{}'.", interDomainPathId, domainId, globalId);
-		return globalId;
+			JuliusRequest request = new JuliusRequest();
+			request.demands.add(connection);
+			String localId = postService(request, interDomainPathId);
+			String globalId = globalize(localId);
+			log.info("Sub path of '{}' on domain '{}' requested: id is '{}'.", interDomainPathId, domainId, globalId);
+			return globalId;
+		} catch (Exception e) {
+			log.error("Error during intra domain path setup. {}: {}.", e.getClass().getSimpleName(), e.getMessage());
+			log.debug("Exception details: ", e);
+			throw new GeneralFailureException(e);
+		}
 	}
 
 	private String postService(JuliusRequest req, String interDomainPathId)
@@ -94,9 +102,16 @@ public class JuliusPlugin extends ProvisioningPlugin {
 			switch (httpResponse.getStatusCode()) {
 				case OK:
 					List<JuliusConnectionResponse> responses = httpResponse.getBody().responses;
-					if (responses.size() != 1) {
+					if (null == responses) {
 						throw new Exception(
-								String.format("%s connections found in response, one expected.", responses.size())
+								"Got null responses array from Julius."
+						);
+					} else if (responses.size() != 1) {
+						throw new Exception(
+								String.format(
+										"%s connections found in response, one expected.",
+										responses.size()
+								)
 						);
 					}
 					return responses.get(0).lspId.toString();
@@ -122,36 +137,48 @@ public class JuliusPlugin extends ProvisioningPlugin {
 			throws EntityNotFoundException, GeneralFailureException {
 		log.info("Deleting path '{}' (sub path of '{}') in domain '{}'.",
 				intraDomainPathId, interDomainPathId, domainId);
-		String localId = unGlobalize(intraDomainPathId);
-
 		try {
-			String url = getControllerUrl() + "julius/lsp/" + localId;
+			String localId = unGlobalize(intraDomainPathId);
 
-			HttpEntity<Object> entity = new HttpEntity<>(null, null);
-			ResponseEntity<?> httpResponse = restTemplate.exchange(
-					url,
-					HttpMethod.DELETE,
-					entity,
-					Object.class
-			);
-			switch (httpResponse.getStatusCode()) {
-				case OK:
-					log.info("Delete request for path '{}' (sub path of '{}') successfully sent.",
-							intraDomainPathId, interDomainPathId);
-					break;
-				default:
-					throw new Exception(
-							String.format("Julius responded on DELETE with code %s %s",
-									httpResponse.getStatusCode().value(),
-									httpResponse.getStatusCode().getReasonPhrase())
-					);
+			try {
+				String url = getControllerUrl() + "julius/lsp/" + localId;
+
+				HttpEntity<Object> entity = new HttpEntity<>(null, null);
+				ResponseEntity<?> httpResponse = restTemplate.exchange(
+						url,
+						HttpMethod.DELETE,
+						entity,
+						Object.class
+				);
+				switch (httpResponse.getStatusCode()) {
+					case OK:
+						log.info("Delete request for path '{}' (sub path of '{}') successfully sent.",
+								intraDomainPathId, interDomainPathId);
+						break;
+					default:
+						throw new Exception(
+								String.format("Julius responded on DELETE with code %s %s",
+										httpResponse.getStatusCode().value(),
+										httpResponse.getStatusCode().getReasonPhrase())
+						);
+				}
+			} catch (Exception e) {
+				log.debug("Exception details: ", e);
+				throw new GeneralFailureException(
+						String.format("Error while deleting path '%s' on domain '%s'. %s: %s",
+								intraDomainPathId, domainId, e.getClass().getSimpleName(), e.getMessage())
+				);
 			}
 		} catch (Exception e) {
+			log.error("Error during intra domain path teardown. {}: {}.", e.getClass().getSimpleName(), e.getMessage());
 			log.debug("Exception details: ", e);
-			throw new GeneralFailureException(
-					String.format("Error while deleting path '%s' on domain '%s'. %s: %s",
-							intraDomainPathId, domainId, e.getClass().getSimpleName(), e.getMessage())
+			listener.notifyIntraDomainPathModification(
+					interDomainPathId,
+					intraDomainPathId,
+					PathLifecycleAction.TEARDOWN,
+					OperationResult.FAILED
 			);
+			throw new GeneralFailureException(e);
 		}
 	}
 
