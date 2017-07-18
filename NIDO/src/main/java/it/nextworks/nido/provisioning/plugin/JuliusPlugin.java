@@ -114,7 +114,7 @@ public class JuliusPlugin extends ProvisioningPlugin {
 								)
 						);
 					}
-					return responses.get(0).lspId.toString();
+					return responses.get(0).lspId;
 
 				default:
 					throw new Exception(

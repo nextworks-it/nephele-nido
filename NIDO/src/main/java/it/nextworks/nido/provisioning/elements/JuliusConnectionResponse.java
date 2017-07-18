@@ -21,6 +21,6 @@ public class JuliusConnectionResponse {
     public Integer requestid;
 
     @JsonProperty("lsp_id")
-    public Integer lspId;
+    public String lspId;
 
 }
