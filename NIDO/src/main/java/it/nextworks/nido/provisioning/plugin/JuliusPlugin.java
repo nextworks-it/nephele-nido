@@ -42,7 +42,7 @@ public class JuliusPlugin extends ProvisioningPlugin {
 	}
 
 	public JuliusPlugin(String domainId, String url) {
-		super(ProvisioningPluginType.PLUGIN_JULIUS, domainId, url, ":8181/", ":8888/topology");
+		super(ProvisioningPluginType.PLUGIN_JULIUS, domainId, url, ":9000/", ":8888/topology");
 	}
 
 	@Override
