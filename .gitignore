@@ -24,4 +24,9 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+### Re-include gentelella files ###
+!NIDO_WEB_GUI/gentelella/build
+!NIDO_WEB_GUI/gentelella/vendors
+
 	
