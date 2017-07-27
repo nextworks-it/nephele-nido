@@ -166,8 +166,14 @@ public class JuliusPlugin extends ProvisioningPlugin {
 				);
 				switch (httpResponse.getStatusCode()) {
 					case OK:
-						log.info("Delete request for path '{}' (sub path of '{}') successfully sent.",
+						log.info("Delete request for path '{}' (sub path of '{}') successful.",
 								intraDomainPathId, interDomainPathId);
+						listener.notifyIntraDomainPathModification(
+								interDomainPathId,
+								intraDomainPathId,
+								PathLifecycleAction.TEARDOWN,
+								OperationResult.COMPLETED
+						);
 						break;
 					default:
 						throw new Exception(
