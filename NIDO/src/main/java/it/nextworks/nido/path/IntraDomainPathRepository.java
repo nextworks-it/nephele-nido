@@ -8,6 +8,7 @@
  */
 package it.nextworks.nido.path;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,5 +21,6 @@ public interface IntraDomainPathRepository extends JpaRepository<IntraDomainPath
 	List<IntraDomainPath> findByDomainId(String domainId);
 	List<IntraDomainPath> findByIdpId(Long id);
 	List<IntraDomainPath> findByIdpInterDomainPathId(String id);
+	List<IntraDomainPath> findByDomainIdAndPathStatusNotIn(String domainId, Collection<PathStatus> pathStatus);
 	
 }

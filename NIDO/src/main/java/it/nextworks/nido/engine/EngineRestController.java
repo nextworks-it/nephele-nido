@@ -120,7 +120,7 @@ public class EngineRestController {
 		log.debug("Received tear down request for path " + pathId);
 		if (pathId == null) {
 			log.error("Received path tear down request without ID");
-			return new ResponseEntity<String>("Delete request without domain ID", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<String>("Delete request without path ID", HttpStatus.BAD_REQUEST);
 		}
 		try {
 			mdcManager.teardownInterDomainPath(pathId);
@@ -130,6 +130,37 @@ public class EngineRestController {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value = "/path/{pathId}/purge", method = RequestMethod.PUT)
+	@ApiOperation(value = "purgePath", nickname = "Purge a failed or terminated inter-domain path with a given ID.")
+    @ApiResponses(value = { 
+    		@ApiResponse(code = 200, message = "Success", response = Void.class),
+    		@ApiResponse(code = 400, message = "Bad request", response = String.class),
+    		@ApiResponse(code = 404, message = "Not found", response = String.class),
+    		@ApiResponse(code = 409, message = "Conflict", response = String.class)})
+	public ResponseEntity<?> purgePath(@ApiParam(name = "pathId", value = "ID of the path to be removed from the system", required = true) @PathVariable String pathId) {
+		log.debug("Received request to purge path " + pathId);
+		if (pathId == null) {
+			log.error("Received path purge request without ID");
+			return new ResponseEntity<String>("Purge request without path ID", HttpStatus.BAD_REQUEST);
+		}
+		try {
+			InterDomainPath path = pathDbWrapper.retrieveInterDomainPath(pathId);
+			log.debug("Path found");
+			PathStatus status = path.getPathStatus();
+			log.debug("Path status: " + status.toString());
+			if (!((status == PathStatus.FAILED) || (status == PathStatus.DELETED))) {
+				log.error("Path " + pathId + " is still active and it cannot be removed.");
+				return new ResponseEntity<String>("Path " + pathId + " is still active and it cannot be removed.", HttpStatus.CONFLICT);
+			}
+			pathDbWrapper.removeInterDomainPath(pathId);
+			mdcManager.removeInterDomainPath(pathId);
+			log.debug("Path " + pathId + " fully removed from the system");
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (EntityNotFoundException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
 

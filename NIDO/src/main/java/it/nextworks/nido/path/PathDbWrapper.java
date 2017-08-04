@@ -8,6 +8,7 @@
  */
 package it.nextworks.nido.path;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,6 +54,12 @@ public class PathDbWrapper {
 		interDomainPathRepository.saveAndFlush(idp);
 	}
 	
+	public synchronized void removeInterDomainPath(String interDomainPathId) throws EntityNotFoundException {
+		InterDomainPath idp = retrieveInterDomainPath(interDomainPathId);
+		interDomainPathRepository.delete(idp);
+		log.debug("Inter domain path " + interDomainPathId + " removed from DB.");
+	}
+	
 	public InterDomainPath retrieveInterDomainPath(String interDomainPathId) throws EntityNotFoundException {
 		Optional<InterDomainPath> idpOpt = interDomainPathRepository.findByInterDomainPathId(interDomainPathId);
 		if (idpOpt.isPresent()) {
@@ -62,6 +69,19 @@ public class PathDbWrapper {
 	
 	public List<InterDomainPath> retrieveAllInterDomainPaths() {
 		return interDomainPathRepository.findAll();
+	}
+	
+	public boolean isDomainInUse(String domainId) {
+		log.debug("Checking if domain " + domainId + " is in use");
+		List<PathStatus> acceptableStatus = new ArrayList<>();
+		acceptableStatus.add(PathStatus.DELETED);
+		acceptableStatus.add(PathStatus.FAILED);
+		List<IntraDomainPath> paths = intraDomainPathRepository.findByDomainIdAndPathStatusNotIn(domainId, acceptableStatus);
+		if (paths.isEmpty()) {
+			log.debug("No active paths found in domain " + domainId + ". The domain is not in use.");
+			return false;
+		}
+		return true;
 	}
 	
 	public synchronized void createIntraDomainPath(String interDomainPathId, IntraDomainPath intraDomainPath) 

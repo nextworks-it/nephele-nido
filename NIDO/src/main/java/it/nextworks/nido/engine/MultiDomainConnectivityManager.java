@@ -127,6 +127,15 @@ public class MultiDomainConnectivityManager implements PathNotificationListenerI
 		}
 	}
 	
+	public void removeInterDomainPath(String pathId) throws EntityNotFoundException {
+		log.debug("Received request to remove " + pathId + " from connectivity manager");
+		if (connectionManagers.containsKey(pathId)) {
+			log.debug("Md connection manager found");
+			connectionManagers.remove(pathId);
+			log.debug("Md connection manager removed");
+		} else throw new EntityNotFoundException("MD connection manager for path ID " + pathId + " not found. Impossible to remove from the system.");
+	}
+	
 	@Override
 	public void notifyPathComputationResult(String interDomainPathId,
 			OperationResult result,

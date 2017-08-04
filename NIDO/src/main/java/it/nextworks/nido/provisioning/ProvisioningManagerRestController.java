@@ -28,6 +28,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import it.nextworks.nido.common.exceptions.EntityAlreadyExistingException;
 import it.nextworks.nido.common.exceptions.EntityNotFoundException;
+import it.nextworks.nido.path.PathDbWrapper;
 import it.nextworks.nido.provisioning.topology.Domain;
 import it.nextworks.nido.provisioning.topology.TopologyDbWrapper;
 
@@ -43,6 +44,8 @@ public class ProvisioningManagerRestController {
 	@Autowired
 	private TopologyDbWrapper topologyDbWrapper;
 	
+	@Autowired
+	private PathDbWrapper pathDbWrapper;
 	
 	@Autowired
 	private ProvisioningManager provisioningManager;
@@ -120,12 +123,17 @@ public class ProvisioningManagerRestController {
     @ApiResponses(value = { 
     		@ApiResponse(code = 204, message = "Success", response = Void.class),
     		@ApiResponse(code = 400, message = "Bad request", response = String.class),
-    		@ApiResponse(code = 404, message = "Not found", response = String.class)})
+    		@ApiResponse(code = 404, message = "Not found", response = String.class),
+    		@ApiResponse(code = 409, message = "Conflict", response = String.class)})
 	public ResponseEntity<?> deleteDomain(@ApiParam(name = "domainId", value = "ID of the domain to be removed", required = true) @PathVariable String domainId) {
 		log.debug("Received delete request for domain " + domainId);
 		if (domainId == null) {
 			log.error("Received domain delete request without ID");
 			return new ResponseEntity<String>("Delete request without domain ID", HttpStatus.BAD_REQUEST);
+		}
+		if (pathDbWrapper.isDomainInUse(domainId)) {
+			log.debug("Domain " + domainId + " is still in use and it cannot be removed.");
+			return new ResponseEntity<String>("Domain " + domainId + " is still in use and it cannot be removed.", HttpStatus.CONFLICT);
 		}
 		try {
 			topologyDbWrapper.removeDomain(domainId);
