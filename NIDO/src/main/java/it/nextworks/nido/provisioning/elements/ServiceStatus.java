@@ -9,11 +9,14 @@
 package it.nextworks.nido.provisioning.elements;
 
 public enum ServiceStatus {
-	
+
 	SCHEDULED,
 	ESTABLISHING,
 	ACTIVE,
 	TERMINATING,
-	DELETED
+	DELETED,
+	REQUESTED,
+	FAILED,
+	TERMINATION_REQUESTED;
 
 }

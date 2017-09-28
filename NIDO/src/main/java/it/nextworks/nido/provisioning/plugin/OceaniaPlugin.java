@@ -300,6 +300,7 @@ public class OceaniaPlugin extends ProvisioningPlugin implements RestExecutorCli
                             intraDomainPathId, interDomainPathId, exc.getMessage());
                 }
                 break;
+            case TERMINATION_REQUESTED:
             case TERMINATING:
                 log.debug("Path '{}' not yet deleted. Scheduling status poll.", intraDomainPathId);
                 scheduleStatusCheck("DELETE_" + intraDomainPathId, inSeconds(POLLING_INTERVAL));
@@ -340,6 +341,7 @@ public class OceaniaPlugin extends ProvisioningPlugin implements RestExecutorCli
                             intraDomainPathId, interDomainPathId, exc.getMessage());
                 }
                 break;
+            case REQUESTED:
             case SCHEDULED:
             case ESTABLISHING:
                 log.debug("Path '{}' not yet established. Scheduling status poll.", intraDomainPathId);
