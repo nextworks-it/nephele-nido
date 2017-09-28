@@ -190,7 +190,7 @@ public class OceaniaPlugin extends ProvisioningPlugin implements RestExecutorCli
         try {
             if (log.isDebugEnabled()) {
                 ObjectMapper mapper = new ObjectMapper();
-                String serviceStr = mapper.writeValueAsString(service);
+                String serviceStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(service);
                 log.debug("Posting service: \n{}.", serviceStr);
             }
             String url = getControllerUrl() + "affinity/connection";

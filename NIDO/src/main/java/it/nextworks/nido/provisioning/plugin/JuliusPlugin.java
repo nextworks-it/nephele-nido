@@ -8,6 +8,7 @@
  */
 package it.nextworks.nido.provisioning.plugin;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.nextworks.nido.common.enums.OperationResult;
 import it.nextworks.nido.common.enums.PathLifecycleAction;
 import it.nextworks.nido.common.exceptions.EntityNotFoundException;
@@ -102,6 +103,11 @@ public class JuliusPlugin extends ProvisioningPlugin {
 	private String postService(JuliusRequest req, String interDomainPathId)
 			throws GeneralFailureException {
 		try {
+			if (log.isDebugEnabled()) {
+				ObjectMapper mapper = new ObjectMapper();
+				String reqStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(req);
+				log.debug("Sending request:");
+			}
 			String url = getControllerUrl() + "julius/lsp_request";
 			HttpHeaders header = new HttpHeaders();
 			header.add("Content-Type", "application/json");
