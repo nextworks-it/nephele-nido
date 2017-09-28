@@ -37,7 +37,6 @@ public class Service {
     public String toString() {
         return "Service{" +
                 "connections=" + connections.toString() +
-                ",\n status=" + status.toString() +
                 '}';
     }
 }
