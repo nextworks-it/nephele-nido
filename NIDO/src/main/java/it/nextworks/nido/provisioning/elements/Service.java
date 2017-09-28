@@ -33,4 +33,11 @@ public class Service {
         connections.add(connection);
     }
 
+    @Override
+    public String toString() {
+        return "Service{" +
+                "connections=" + connections.toString() +
+                ",\n status=" + status.toString() +
+                '}';
+    }
 }

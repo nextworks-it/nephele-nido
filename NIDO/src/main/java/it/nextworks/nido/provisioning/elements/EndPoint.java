@@ -37,4 +37,12 @@ public class EndPoint {
     @JsonProperty("Zone_ID")
     public Integer zoneId;
 
+    @Override
+    public String toString() {
+        return "EndPoint{" +
+                "podId=" + podId +
+                ", toRId=" + toRId +
+                ", zoneId=" + zoneId +
+                '}';
+    }
 }
