@@ -187,7 +187,7 @@ public class OceaniaPlugin extends ProvisioningPlugin implements RestExecutorCli
     private String postService(Service service, String interDomainPathId)
             throws GeneralFailureException {
         try {
-            log.debug("Posting service \n{}");
+            log.debug("Posting service: \n{}.", service);
             String url = getControllerUrl() + "affinity/connection";
             HttpHeaders header = new HttpHeaders();
             header.add("Content-Type", "application/json");
