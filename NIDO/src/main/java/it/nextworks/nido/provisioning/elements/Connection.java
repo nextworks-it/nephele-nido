@@ -8,6 +8,7 @@
  */
 package it.nextworks.nido.provisioning.elements;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import it.nextworks.nido.path.ConnectionType;
 
@@ -27,12 +28,14 @@ public class Connection {
                       EndPoint destinationEndPoint,
                       Recovery recovery,
                       TrafficProfile trafficProfile,
-                      ConnectionType connectionType) {
+                      ConnectionType connectionType,
+                      String destIp) {
         this.destinationEndPoint = destinationEndPoint;
         this.recovery = recovery;
         this.trafficProfile = trafficProfile;
         this.connectionType = connectionType;
         this.sourceEndPoint = sourceEndPoint;
+        this.destIp = destIp;
     }
 
     @JsonProperty("Destination_end_point")
@@ -49,5 +52,9 @@ public class Connection {
 
     @JsonProperty("Source_end_point")
     public EndPoint sourceEndPoint;
+
+    @JsonProperty("Destination_IP")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public String destIp;
 
 }

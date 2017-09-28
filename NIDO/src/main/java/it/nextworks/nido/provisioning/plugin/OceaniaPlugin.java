@@ -78,20 +78,25 @@ public class OceaniaPlugin extends ProvisioningPlugin implements RestExecutorCli
     public String setupIntraDomainPath(String interDomainPathId, IntraDomainPath path,
                                        PathNotificationListenerInterface listener)
             throws EntityNotFoundException, GeneralFailureException {
+
         log.info("Setting up sub path of '{}' in domain '{}'.", interDomainPathId, domainId);
+
+        String srcNodeId;
+        Integer srcPort;
+        String dstNodeId;
+        Integer dstPort;
+
         try {
             checkInput(path);
+            srcNodeId = path.getSourceEndPoint().getNodeId();
+            srcPort = Integer.parseInt(path.getSourceEndPoint().getPortId());
+            dstNodeId = path.getDestinationEndPoint().getNodeId();
+            dstPort = Integer.parseInt(path.getDestinationEndPoint().getPortId());
         } catch (EntityNotFoundException | GeneralFailureException e) {
             log.error("Malformed request for path '{}' on domain '{}': {}.",
                     interDomainPathId, domainId, e.getMessage());
             throw e;
         }
-
-        String srcNodeId = path.getSourceEndPoint().getNodeId();
-        Integer srcPort = Integer.parseInt(path.getSourceEndPoint().getPortId());
-
-        String dstNodeId = path.getDestinationEndPoint().getNodeId();
-        Integer dstPort = Integer.parseInt(path.getDestinationEndPoint().getPortId());
 
         EndPoint reqSrc = new EndPoint(getPodId(srcNodeId), getTorId(srcNodeId), srcPort);
         EndPoint reqDst = new EndPoint(getPodId(dstNodeId), getTorId(dstNodeId), dstPort);
@@ -103,7 +108,8 @@ public class OceaniaPlugin extends ProvisioningPlugin implements RestExecutorCli
                 reqDst,
                 Recovery.UNPROTECTED,
                 profile,
-                path.getConnectionType()
+                path.getConnectionType(),
+                path.getTrafficClassifier().getDstIpAddress()
         );
 
         Service request = new Service();
@@ -389,12 +395,20 @@ public class OceaniaPlugin extends ProvisioningPlugin implements RestExecutorCli
         scheduleStatusCheck(intraDomainPathId, inSeconds(POLLING_INTERVAL));
     }
 
-    private Integer getPodId(String nodeId) {
-        return Integer.parseInt(nodeId.substring(1, 3));
+    private Integer getPodId(String nodeId) throws GeneralFailureException {
+        try {
+            return Integer.parseInt(nodeId.substring(1, 3));
+        } catch (StringIndexOutOfBoundsException exc) {
+            throw new GeneralFailureException(String.format("Malformed node id '%s'.", nodeId));
+        }
     }
 
-    private Integer getTorId(String nodeId) {
-        return Integer.parseInt(nodeId.substring(3, 6));
+    private Integer getTorId(String nodeId) throws GeneralFailureException {
+        try {
+            return Integer.parseInt(nodeId.substring(3, 5));
+        } catch (StringIndexOutOfBoundsException exc) {
+            throw new GeneralFailureException(String.format("Malformed node id '%s'.", nodeId));
+        }
     }
 
     private void checkInput(IntraDomainPath path)
