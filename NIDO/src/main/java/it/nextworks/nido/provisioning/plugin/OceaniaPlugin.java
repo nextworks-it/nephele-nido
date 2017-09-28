@@ -8,6 +8,7 @@
  */
 package it.nextworks.nido.provisioning.plugin;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.nextworks.nido.common.enums.OperationResult;
 import it.nextworks.nido.common.enums.PathLifecycleAction;
 import it.nextworks.nido.common.exceptions.EntityNotFoundException;
@@ -187,7 +188,11 @@ public class OceaniaPlugin extends ProvisioningPlugin implements RestExecutorCli
     private String postService(Service service, String interDomainPathId)
             throws GeneralFailureException {
         try {
-            log.debug("Posting service: \n{}.", service);
+            if (log.isDebugEnabled()) {
+                ObjectMapper mapper = new ObjectMapper();
+                String serviceStr = mapper.writeValueAsString(service);
+                log.debug("Posting service: \n{}.", serviceStr);
+            }
             String url = getControllerUrl() + "affinity/connection";
             HttpHeaders header = new HttpHeaders();
             header.add("Content-Type", "application/json");

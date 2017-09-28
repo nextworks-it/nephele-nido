@@ -59,13 +59,13 @@ public class Connection {
 
     @Override
     public String toString() {
-        return "Connection{\n\t" +
+        return "\nConnection{\n\t" +
                 "destinationEndPoint=" + destinationEndPoint.toString() +
                 ",\n\t recovery=" + recovery.toString() +
                 ",\n\t trafficProfile=" + trafficProfile.toString() +
                 ",\n\t connectionType=" + connectionType.toString() +
                 ",\n\t sourceEndPoint=" + sourceEndPoint.toString() +
-                ",\n\t destIp='" + destIp.toString() + '\'' +
-                '}';
+                ",\n\t destIp='" + destIp + '\'' +
+                "\n}\n";
     }
 }
