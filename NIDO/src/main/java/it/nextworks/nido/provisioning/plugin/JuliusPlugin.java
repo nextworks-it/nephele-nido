@@ -30,6 +30,7 @@ import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.List;
 import java.util.PrimitiveIterator;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 public class JuliusPlugin extends ProvisioningPlugin {
@@ -75,6 +76,8 @@ public class JuliusPlugin extends ProvisioningPlugin {
 
 			JuliusRequest request = new JuliusRequest();
 			request.demands.add(connection);
+			String opID = UUID.randomUUID().toString();
+			log.debug("Sending request to Julius. OpID: {}.", opID);
 			String localId = postService(request, interDomainPathId);
 			String globalId = globalize(localId);
 			if (localId.equals("FAILED")) {
@@ -86,6 +89,7 @@ public class JuliusPlugin extends ProvisioningPlugin {
 								"under inter domain path '%s'.", interDomainPathId));
 			}
 			log.info("Sub path of '{}' on domain '{}' established: id is '{}'.", interDomainPathId, domainId, globalId);
+			log.debug("JULIUS request successful. OpID: {}.", opID);
 			listener.notifyIntraDomainPathModification(
 					interDomainPathId,
 					globalId,

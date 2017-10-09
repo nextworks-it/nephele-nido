@@ -37,6 +37,7 @@ import java.text.ParsePosition;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class OceaniaPlugin extends ProvisioningPlugin implements RestExecutorClientInterface {
@@ -115,9 +116,11 @@ public class OceaniaPlugin extends ProvisioningPlugin implements RestExecutorCli
 
         Service request = new Service();
         request.addConnection(connection);
+
         String localId = postService(request, interDomainPathId);
         String globalId = globalize(localId);
         log.info("Sub path of '{}' on domain '{}' requested: id is '{}'.", interDomainPathId, domainId, globalId);
+        log.debug("OCEANIA request sent. OpId: {}.", globalId);
 
         scheduleStatusCheck(globalId, inSeconds(1));
 
@@ -329,6 +332,7 @@ public class OceaniaPlugin extends ProvisioningPlugin implements RestExecutorCli
         switch (status) {
             case ACTIVE:
                 log.info("Established path '{}' (sub path of '{}').", intraDomainPathId, interDomainPathId);
+                log.debug("OCEANIA request successful. OpId: {}.", intraDomainPathId);
                 try {
                     listener.notifyIntraDomainPathModification(
                             interDomainPathId,
