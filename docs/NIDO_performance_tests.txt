@@ -1,0 +1,64 @@
+The CSV files report the performance of the NIDO orchestrator when operating over a 3 DCN cluster at varying request frequency.
+The exact numbers are reported in the following:
+
++++++++++++++++++++++++++++++++
++ DCNs			| 3   +
++++++++++++++++++++++++++++++++
++ Pods per DCN		| 10  +
++++++++++++++++++++++++++++++++
++ Planes per DCN	| 2   +
++++++++++++++++++++++++++++++++
++ Tors per Pod:		| 10  +
++++++++++++++++++++++++++++++++
++ Servers per Tor	| 2   +
++++++++++++++++++++++++++++++++
++ Nodes per DCN		| 120 +
++++++++++++++++++++++++++++++++
++ Servers per DCN	| 200 +
++++++++++++++++++++++++++++++++
++ Servers (total)	| 600 +
++++++++++++++++++++++++++++++++
++ Inter-DCN nodes	| 9   +
++++++++++++++++++++++++++++++++
++ Nodes (total)		| 369 +
++++++++++++++++++++++++++++++++
+
+Each test has been perfomed by sending random path requests to the NIDO orchestrator for 10 minutes at a different rate:
+
+++++++++++++++++++++++++++++
++  Test number  +  Reqs/s  +
+++++++++++++++++++++++++++++
+|       1       +    0.2   +
+++++++++++++++++++++++++++++
+|       2       +    0.5   +
+++++++++++++++++++++++++++++
+|       3       +    1.0   +
+++++++++++++++++++++++++++++
+|       4       +    1.5   +
+++++++++++++++++++++++++++++
+|       5       +    2.0   +
+++++++++++++++++++++++++++++
+
+The csv files report the following values obtained during the corresponding test:
+
+- Average of the path instatiation time (i.e. total time from request to active path)
+- Maximum path instatiation time
+- Minimum path instatiation time
+- Standard deviation of the path instatiation time
+- Average of the path computation time (i.e. time needed to compute a path through the DCN graph)
+- Maximum path computation time
+- Minimum path computation time
+- Standard deviation of the path computation time
+- Average of the path provisioning time (i.e. fraction of the instantiation time spent waiting for the domain controller to instantiate the intra-domain paths)
+- Maximum path provisioning time
+- Minimum path provisioning time
+- Standard deviation of the path provisioning time
+- Average of the Julius path instatiation time (i.e. time required by Julius to instantiate a path on the inter-DC network)
+- Maximum path Julius instatiation time
+- Minimum path Julius instatiation time
+- Standard deviation of the Julius path instatiation time
+- Average of the Julius path instatiation time (i.e. time required by Oceania to instantiate a path on the DC network)
+- Maximum path Julius instatiation time
+- Minimum path Julius instatiation time
+- Standard deviation of the Julius path instatiation time
+
